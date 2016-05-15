@@ -34,7 +34,7 @@ class MoneyMapper(BlockchainCrawler.BlockchainCrawler):
             return
 
         client = MongoClient(Settings.db_server, Settings.db_port)
-        db = client.bitcoin_db
+        db = client.bitcoin
         collection = db.transactions
         collection.insert_many(self.money_movements)
         client.close()
