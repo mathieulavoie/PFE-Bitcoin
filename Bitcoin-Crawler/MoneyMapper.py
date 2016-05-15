@@ -12,7 +12,6 @@ class MoneyMapper(BlockchainCrawler.BlockchainCrawler):
         super().__init__()
         self.money_movements = []
         self.addr_utils = AddressUtils.Addressutils()
-        self.max_batch_insert = 10000
 
     def do_work(self,inputs, outputs):
         if len(inputs) == 0: #No Valid Tx, an empty block with only one mining tx
@@ -36,7 +35,7 @@ class MoneyMapper(BlockchainCrawler.BlockchainCrawler):
         client = MongoClient(Settings.db_server, Settings.db_port)
         db = client.bitcoin
         collection = db.transactions
-        collection.insert_many(self.money_movements)
+        collection.insert_many(self.money_movements, ordered=False)
         client.close()
         print("DB Sync Finished")
 
@@ -53,13 +52,12 @@ def start(start_block_id):
 
                 if block_id - start_block_id > 0 and (block_id - start_block_id) % Settings.block_crawling_limit == 0:
                     mapper.insert_into_db()
-                    mapper.money_movements = []
+                    mapper = MoneyMapper()
 
                 block_id+=1
 
             #Sync the rest
             mapper.insert_into_db()
-            mapper.money_movements = []
 
             #DONE!
 
