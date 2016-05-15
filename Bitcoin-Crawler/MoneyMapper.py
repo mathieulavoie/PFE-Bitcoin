@@ -1,5 +1,6 @@
 import sys
 import AddressUtils
+import bitcoin.rpc
 
 __author__ = 'Mathieu'
 import BlockchainCrawler
@@ -42,6 +43,7 @@ class MoneyMapper(BlockchainCrawler.BlockchainCrawler):
 
 
 
+
 def start(start_block_id):
         mapper = MoneyMapper()
         block_id = start_block_id
@@ -52,7 +54,8 @@ def start(start_block_id):
 
                 if block_id - start_block_id > 0 and (block_id - start_block_id) % Settings.block_crawling_limit == 0:
                     mapper.insert_into_db()
-                    mapper = MoneyMapper()
+                    mapper.money_movements = []
+                    mapper.proxy = bitcoin.rpc.Proxy()
 
                 block_id+=1
 
